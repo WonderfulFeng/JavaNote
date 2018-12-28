@@ -1,0 +1,105 @@
+java文件操作：
+    file.listFile();获取当前录下的所有子项
+    file.listFile(FileFilter fileter);添加一个过滤器
+    file.getParentFile();获取父目录
+    file.mkdirs();创建父目录
+    file.getName();获取file文件名称
+    file.length();文件的字节长度，如果是目录 值为0
+读写文件：
+///////////////////////////////TODO RandomAccessFile //////////////////////////
+    RandomAccessFile：该类读写是基于指针操作的。默认永远都是从第一个字节开始写或读
+    RandomAccessFile(file/path,"rw/r");参数二 读取模式
+    raf.read() 读取一个字节  读完之后继续读 EOF
+    raf.write(int n) 只写n的二进制的最后八位 所以会有数据丢失
+    raf.write(byte[] byte) 一次读一个字节数组  一般10K就够了
+    raf.write(byte[] byte,int start,int length) 从start处开始写length个字节
+    raf.WriteInt(int n)   raf.writeLong(Long n) ... 写入基本类型
+    long position = raf.getFilePointer();获取当前指针的位置。
+
+    移动指针操作：
+        seek(Long position)可以将指针移动到某个位置
+        skipBytes(int n )尝试跳过n个字节（只能往后，不能往前） 返回实际跳过的字节量
+
+使用：文件拷贝
+    try {
+        RandomAccessFile raf1 = new RandomAccessFile("1.jpg", "r");
+        RandomAccessFile raf2 = new RandomAccessFile("copy.jpg", "rw");
+        int d = -1;
+        while ((d = raf1.read()) != -1) raf2.write(d);
+        raf1.close();
+        raf2.close();
+    } catch (FileNotFoundException e) {
+        e.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+////////////////////////////////////////////////TODO JAVA IO ////////////////////////////////////////////////////////////////////////
+
+顶级父类：
+    InputStream：read(int n);    read(byte[] buff);    read(byte b[], int off, int len);   skip(Long n);
+    OutputStream：write(int b);  write(byte[] buff);   write(byte b[], int off, int len);  flush();
+
+////////////////////////////TODO 字节流 节点流  低级流  FileOutputStream  FileInputStream
+
+    FileOutputStream : write(int n ); 只能写一个字节(所以如果写的是256 读出来就会为0)
+                       write(byte[] buf);写一个字节数组
+                       write(byte b[], int off, int len);从off开始向后写len长字节
+    FileOutputStream fos = new FileOutputStream(String path,boolean isAppent)  如果文件存在是否追加写入(默认覆盖  即 false)
+
+    FileInputStream ：read(int n);只读取一个字节
+                       read(byte[] buf) ;读取一个字节数组长度的字节放进数组中
+                       read(byte b[], int off, int len);从off开始读取len个字节放入数组中
+    附：String str = new String(bytes,"utf-8"); 按指定的编码以指定的字节数组创建字符串
+
+///////////////////////////////TODO  处理流 高级流
+/////////TODO 缓冲流  作用：加快读写效率   注意：如果流不关  要及时 flush()出去。
+//TODO   缓冲流：BufferedInputStream  内部维护着一个缓冲区(字节数组)，使用该流在读取一个字节时，该流会尽可能多的一次性读取若干个字节存入缓冲区
+//TODO                                然后逐一的将字节返回，直到缓冲区中的数据全部读取完毕，会再次读取若干字节，这样就减少了读取的次数，提高了效率。
+        方法源码：  public synchronized int read() throws IOException {
+                     if (pos >= count) {
+                         fill(); //填充自身维护的数组 内部将pos 与 count 都重置了
+                         if (pos >= count)  //再判断 是否 pos > count 只有读取完毕后才会出现这种情况
+                             return -1;
+                     }
+                     return getBufIfOpen()[pos++] & 0xff; // 内存与cpu通信时返回的字节
+                 }
+
+//TODO   缓冲流：BufferedOutputStream  内部维护着一个缓冲数组，每当我们写数据时，都会先将数据存入缓冲区，当缓冲区已满时，缓冲流会将数据一次性全部写出。
+        方法源码：   public synchronized void write(int b) throws IOException {
+                        if (count >= buf.length) {
+                            flushBuffer();
+                        }
+                        buf[count++] = (byte)b;
+                    }
+///////////TODO 对象流  作用：可以读写对象
+//TODO  对象流：ObjectInputStream   ObjectOutputStream   可以写或读一个对象 要求写的对象实现Serializable接口  某个属性被 transient 修饰后 就不会被序列化
+//TODO 特殊方法: readObject();  writeObect();
+
+
+//////////////////////////////TODO 字符流  （均是高级流）  以char为单位读写数据   只用来处理文本文件
+    Reader 字符输入流的父类：int read() ; 读取一个字符，返回int值 “低16位有效”
+                             int read(char[] chs);读取数组长度个字节并放入数组中，返回实际读取到的字符量。
+    Writer 字符输出流的父类：write(int c); 写出一个字符，写出给定int值“低16”位表示的字符
+                             write(char[] chs);将给定字符数组中所有字符写出。
+                             write(String str);将给定的字符串写出
+                             write(char[] chs,int offset,int len);从chs的offset处开始写len长度的的字符。
+
+////////////TODO 字符转换流
+//TODO    InputStreamReader:使用该流可以设置字符集，并按照指定的字符集从流中按照该编码将字节数据转换成字符并读取。
+//TODO    OutputStreamWriter：使用该流可以设置字符集，并按照指定的字符集将字符转换为对应字节后通过该流写出。内部存在 8k 字节缓存数组
+//TODO   优势： 可以按照指定的字符集读写 一次可以读取一个字符  new OutputStreamWriter(fos,"UTF-8");
+
+///////////TODO 字符缓冲流  可以以行为单位读写字符串
+//TODO  PrintWriter：能接字节流 也能接字符流
+        丰富的构造方法： PrintWriter out = new PrintWriter(Writer writer，boolean autoFlush);参数而可选 默认 false 为true 每调用一次println 自动刷出缓存数组中的数据
+                         PrintWriter out = new PrintWriter(OutputStream outputStream，boolean autoflush);同上
+                         PrintWriter out = new PrintWriter(File file);
+                         PrintWriter out = new PrintWriter(file,String charSet);
+        方法：print(String str);
+              println(String str);
+
+//TODO  BufferedReader: 特有方法readLine(); 以换行符为界限一次读取一行
+
+/////////////////////////////////////////////////////////////TODO JAVA  就近原则 ///////////////////////////
+引用类型：先找子类  再找父类 再找 接口  最后 找Object
+基本类型：先找符合的基本类型  再找 包装类

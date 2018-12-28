@@ -1,0 +1,65 @@
+JAVA多线程：
+    线程创建方式：new Thread(){run()}.start();
+                  new Thread( new Runnable(){run()}).start();
+    线程中的方法：Thread current = Thread.currentThread();
+                  long getId();返回该线程的id
+                  String getName();返回该线程的名称
+                  int getPriority();返回线程的优先级
+                  Threa.state getState();获取线程的状态
+                  boolean isAlive();线程是否处于活动状态
+                  boolean isDaemon();线程是否为后台线程
+                  boolean isInterrupted();线程是否已经中断
+    线程优先级：共10级 1 最低 10 最高  5 默认
+    最低：Thread.MIN_PRIORITY
+    最高：Thread.MAX_PRIORITY
+    默认：Thread.NORM_PRIORITY
+    设置优先级：setPriority(int n ); 优先级越高获取cpu时间片的几率就越大
+    后台线程/守护线程：setDaemon(boolean); 要在start方法之前调用。当进程中只剩下守护线程时，所有守护线程强制终止。GC就是运行在一个守护线程上的
+
+    Thread.sleep(long tiem);线程等待 无法精准等待 是从Running状态到Runnable状态
+    Thread.yield();让当前线程主动让出当次CPU时间片回到Runnable状态，等待分配时间片。
+    thread.join() 该方法用于等待当前线程结束 在b的run()中a.join(), b等到a结束了才开始执行  可是使线程同步
+
+    synchronized:java中的同步锁
+    Object的wait与notify方法： obj.wait();阻塞当前线程， 只有当别个线程调用了 obj.notify()线程才会接着执行。
+                              注意用这个方法时，一定要加上同步锁，谁等，锁的的对象就是谁。
+    obj.notifyAll();当多个线程都调用obj的wait方法，用该方法可以将多个线程都唤醒，如果只用notify就只能随机唤醒某一个线程。
+
+    线程安全：
+    StringBuffer 是同步的 synchronized append()
+    StringBuilder 不是同步的 append();
+
+    Vector 和 Hashtable 是同步的
+    ArrayList 和 HashMap 不是同步的
+
+    获取线程安全的集合方式：Collections.synchrinizedList(list);  Collections.synchronizedMap(map);
+
+    池的概念：1.控制数量 2.重用线程
+
+    线程池: ExecutorService类
+    线程池的实现策略：
+           Executors.newCachedThreadPool();创建一个可根据需要创建新的线程池，但是在以前构造的线程可用时将重用他们。
+           Executors.newFixdThreadPool(int count);创建一个可重用固定线程集合的线程池，线程数量固定
+           Executors.newSingleThreadExecutor();创建一个只有一个线程的线程池
+           Executors.newScheduledThreadPool(int corePoolSize);创建一个线程池，他可以给定延迟后运行或是定期执行
+    方法：executorService.excute(runnable);将任务交给线程池运行
+
+    ///////////////////////TODO 双缓冲队列
+    BlockingQueue:双缓冲队列，在多线程并发时，如需要使用队列，我们可以使用Queue，但是要解决一个问题就是同步，
+                  但同步操作会降低并发对Queue操作的效率，BlockingQueue内部使用两条队列，可允许两个线程同时向队列一个做存储
+                  一个做取出操作，保证并发安全的同时提高了队列的存取效率。
+    实现类：
+    ArrayBlockingQueue：规定大小的BlockingQueue，其构造方法必须传入一个int参数来指定其大小，其包含的对象是以FIFO顺序排列的。
+    LinkedBlockingQueue：大小不定的BlockingQueue，若构造方法传入一个int参数，则生成的队列有大小限制，
+                         如果不传，则为Integer.MAX_VALUE.其包含的对象是以FIFO顺序排列的
+    PriorityBlockingQueue：类似于LickedBlockingQueue，但其对象的排序不是FIFO，而是依据对象的自然排序顺序，
+                          或是构造方法的Comparator决定的顺序
+    SynchronousQueue：特殊的BlockingQueue，对其操作必须是放和取交替完成的。意思就是只能存一个元素。
+
+
+
+
+
+
+
+

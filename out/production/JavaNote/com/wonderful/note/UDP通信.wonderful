@@ -1,0 +1,33 @@
+UDP通信：
+    1.客户端打包填上地址，发送给服务端，服务端拆包，读取数据。
+    2.服务端读取客户端的地址，打包数据，填上地址，发送数据包。
+ DatagramPacket:UDP数据报基于IP建立的，每台主机有65536个端口号使用。数据报中字节数组限制为65536-8
+ 构造接收包：
+ DatagramPacket(byte[] buy,int length)将数据包中length长度的数据装进buf数组中。
+ DatagtamPacket(byte[] buf,int offset,int length)将数据包中从offset开始、length长的数据装进buf数组
+
+ 构造发送包：
+ DatagramPacket(byte[] buf, int length,InetAddress clientAddress,int clientPort)从buf 数组中，取处length长的数据
+ 创建数据包对象，目标是clientAddress地址，clientPort端口，通常用来发送数据给客户端。
+ DatagramPacket(byte[] buf,int offset, int length,InetAddress clientAddress,int clientPort)从buf 数组中，取处从offset开始,length长的数据
+ 创建数据包对象，目标是clientAddress地址，clientPort端口，通常用来发送数据给客户端。
+
+
+  服务端接收：
+  DatagramSocket :用于接收和发送UDP的Socket实例。
+  DatagramSocket(int port);创建实例，并固定监听port端口的报文，通常用于服务端
+  receive(DatagramPacket data) 接收数据报文到data中，receive方法产生 “阻塞”
+
+  客户端发送：
+  DatagramSocket ：用于接收和发送UDP的Socket实例。
+  无参的构造方法：DatagramSocket();通常用于客户端编程，他并没有特定的监听端口，仅仅使用一个临时的。程序会让操作系统分配一个可用的端口。
+  send（DatagramPacket data）:该方法用于发送报文data到目的地。
+
+
+
+
+
+
+
+
+

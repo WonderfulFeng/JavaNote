@@ -1,0 +1,6 @@
+TCP通信：
+一、Socket 称作“套接字” 就是Java中的一个类，封装了IP地址，端口号，以及connect方法。
+    一般有两种Socket:ServerSocket 位于服务端 ，Socket 位于客户端
+    当连接成功时，两端都会产生一个 Socket 实例，操作这个实例就可以完成会话。
+
+ServerSocket: 有一个accept方法，该方法用于监听指定的端口号，该方法是一个阻塞方法，直到有一个客户端连接进来，一旦连接上，就会返回该客户端的Socket;
